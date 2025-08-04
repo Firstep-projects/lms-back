@@ -1,38 +1,40 @@
+using DatabaseBroker.Repositories;
 using Entity.DataTransferObjects.Learning;
 using Entity.Exceptions;
 using Entity.Models.Learning;
+using Microsoft.EntityFrameworkCore;
 
 namespace LearningService.Services;
 
-public class ArticleService(IArticleRepository articleRepository) : IArticleService
+public class ArticleService(GenericRepository<Article, long>  articleRepository) : IArticleService
 {
     public async Task<Article> CreateArticleAsync(ArticleDto article)
     {
         var newArticle = new Article()
         {
-            Title = article.title,
-            Description = article.description,
-            Content = article.content,
-            Image = article.image,
-            AuthorId =article.authorId,
-            CategoryId = article.categoryId,
+            Title = article.Title,
+            Description = article.Description,
+            Content = article.Content,
+            Image = article.Image,
+            AuthorId =article.AuthorId,
+            CategoryId = article.CategoryId,
         };
 
-        return await articleRepository.AddAsync(newArticle);
+        return await articleRepository.AddWithSaveChangesAsync(newArticle);
     }
 
-    public async Task<Article> DeleteArticleAsync(int articleId)
+    public async Task<Article> DeleteArticleAsync(long articleId)
     {
         var articleResult = await articleRepository.GetByIdAsync(articleId)
             ?? throw new NotFoundException("Logotype not found");
 
-        return await articleRepository.RemoveAsync(articleResult);
+        return await articleRepository.RemoveWithSaveChangesAsync(articleId);
     }
 
     public async Task<IList<Article>> GetAllArticleAsync(MetaQueryModel metaQuery)
     {
         var articles = await articleRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
             .Select(a => new Article()
@@ -52,10 +54,10 @@ public class ArticleService(IArticleRepository articleRepository) : IArticleServ
         return articles;
     }
 
-    public async Task<IList<Article>> GetAllArticleByCategoryIdAsync(MetaQueryModel metaQuery, int categoryId)
+    public async Task<IList<Article>> GetAllArticleByCategoryIdAsync(MetaQueryModel metaQuery, long categoryId)
     {
         var articles = await articleRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Where(a => a.CategoryId == categoryId)
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
@@ -79,7 +81,7 @@ public class ArticleService(IArticleRepository articleRepository) : IArticleServ
     public async Task<IList<ArticleForWithDetailsDto>> GetArticleWithDetailsAsync(MetaQueryModel metaQuery)
     {
         var articles = articleRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
             .Select(a => new Article()
@@ -109,7 +111,7 @@ public class ArticleService(IArticleRepository articleRepository) : IArticleServ
         return result;
     }
     
-    public async Task<Article> GetArticleByIdAsync(int id)
+    public async Task<Article> GetArticleByIdAsync(long id)
     {
         var article = await articleRepository.GetByIdAsync(id);
 
@@ -128,13 +130,13 @@ public class ArticleService(IArticleRepository articleRepository) : IArticleServ
         articleResult.CategoryId = article.CategoryId is not 0 ? article.CategoryId : articleResult.CategoryId;
         articleResult.AuthorId = article.AuthorId is not 0 ? article.AuthorId : articleResult.AuthorId;
 
-        return await articleRepository.UpdateAsync(articleResult);
+        return await articleRepository.UpdateWithSaveChangesAsync(articleResult);
     }
 
-    public async Task<IList<Article>> GetAllArticleByHashtagIdAsync(MetaQueryModel metaQuery, int hashtagId)
+    public async Task<IList<Article>> GetAllArticleByHashtagIdAsync(MetaQueryModel metaQuery, long hashtagId)
     {
         var newArticle = await articleRepository
-            .GetAllAsQueryable(deleted: metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
             .Select(a => new Article()
@@ -154,10 +156,10 @@ public class ArticleService(IArticleRepository articleRepository) : IArticleServ
         return newArticle;
     }
 
-    public async Task<IList<Article>> GetAllArticleByAuthorIdAsync(MetaQueryModel metaQuery, int authorId)
+    public async Task<IList<Article>> GetAllArticleByAuthorIdAsync(MetaQueryModel metaQuery, long authorId)
     {
         var newArticle = await articleRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Where(x => x.AuthorId == authorId)
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)

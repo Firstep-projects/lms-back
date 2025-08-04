@@ -1,15 +1,17 @@
+using DatabaseBroker.Repositories;
 using Entity.DataTransferObjects.Learning;
 using Entity.Exceptions;
 using Entity.Models.Learning;
+using Microsoft.EntityFrameworkCore;
 
 namespace LearningService.Services;
 
 public class SeminarVideoService(
-    ICategoryRepository categoryRepository,
-    ISeminarVideoRepository seminarVideoRepository)
+    GenericRepository<Category, long> categoryRepository,
+    GenericRepository<SeminarVideo, long> seminarVideoRepository)
     : ISeminarVideoService
 {
-    public async ValueTask<SeminarVideo> CreateSeminarVideoAsync(SeminarVideoDto seminarVideo)
+    public async Task<SeminarVideo> CreateSeminarVideoAsync(SeminarVideoDto seminarVideo)
     {
         var nwCourse = new SeminarVideo()
         {
@@ -19,10 +21,10 @@ public class SeminarVideoService(
             CategoryId = seminarVideo.categoryId,
         };
 
-        return await seminarVideoRepository.AddAsync(nwCourse);
+        return await seminarVideoRepository.AddWithSaveChangesAsync(nwCourse);
     }
 
-    public async ValueTask<Category> CreateSeminarVideoCategoryAsync(CategoryDto seminarVideoCategory)
+    public async Task<Category> CreateSeminarVideoCategoryAsync(CategoryDto seminarVideoCategory)
     {
         var nwCategory = new Category() 
         {        
@@ -30,29 +32,29 @@ public class SeminarVideoService(
             Description =seminarVideoCategory.description,
             ImageLink = seminarVideoCategory.imageLink
         };
-        return await categoryRepository.AddAsync(nwCategory);
+        return await categoryRepository.AddWithSaveChangesAsync(nwCategory);
     }
 
-    public async ValueTask<SeminarVideo> DeleteSeminarVideoAsync(int seminarVideoId)
+    public async Task<SeminarVideo> DeleteSeminarVideoAsync(long seminarVideoId)
     {
         var articleResult = await seminarVideoRepository.GetByIdAsync(seminarVideoId)
             ?? throw new NotFoundException("Logotype not found");
 
-        return await seminarVideoRepository.RemoveAsync(articleResult);
+        return await seminarVideoRepository.RemoveWithSaveChangesAsync(seminarVideoId);
     }
 
-    public async ValueTask<Category> DeleteSeminarVideoCategoryAsync(int categoryId)
+    public async Task<Category> DeleteSeminarVideoCategoryAsync(long categoryId)
     {
         var articleResult = await categoryRepository.GetByIdAsync(categoryId)
                             ?? throw new NotFoundException("Logotype not found");
 
-        return await categoryRepository.RemoveAsync(articleResult);
+        return await categoryRepository.RemoveWithSaveChangesAsync(categoryId);
     }
 
-    public async ValueTask<IList<SeminarVideo>> GetAllSeminarVideoAsync(MetaQueryModel metaQuery)
+    public async Task<IList<SeminarVideo>> GetAllSeminarVideoAsync(MetaQueryModel metaQuery)
     {
         var seminarVideos = await seminarVideoRepository
-           .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+           .GetAllAsQueryable()
            .Skip(metaQuery.Skip)
            .Take(metaQuery.Take)
            .Select(sv => new SeminarVideo()
@@ -70,10 +72,10 @@ public class SeminarVideoService(
         return seminarVideos;
     }
 
-    public async ValueTask<IList<SeminarVideo>> GetAllSeminarVideoByAuthorIdAsync(MetaQueryModel metaQuery, int authorId)
+    public async Task<IList<SeminarVideo>> GetAllSeminarVideoByAuthorIdAsync(MetaQueryModel metaQuery, long authorId)
     {
         var newSeminars = await seminarVideoRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Where(x => x.AuthorId == authorId)
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
@@ -92,10 +94,10 @@ public class SeminarVideoService(
         return newSeminars;
     }
 
-    public async ValueTask<IList<SeminarVideo>> GetAllSeminarVideoByHashtagIdAsync(MetaQueryModel metaQuery, int hashtagId)
+    public async Task<IList<SeminarVideo>> GetAllSeminarVideoByHashtagIdAsync(MetaQueryModel metaQuery, long hashtagId)
     {
         var newSeminars = await seminarVideoRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
             .Select(seminar => new SeminarVideo()
@@ -114,25 +116,25 @@ public class SeminarVideoService(
         return newSeminars;
     }
 
-    public async ValueTask<IList<Category>> GetAllSeminarVideoCategoryAsync(MetaQueryModel metaQuery)
+    public async Task<IList<Category>> GetAllSeminarVideoCategoryAsync(MetaQueryModel metaQuery)
     {
         var articles = await categoryRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
             .ToListAsync();
         return articles;
     }
 
-    public async ValueTask<Category> GetCategoryById(int id)
+    public async Task<Category> GetCategoryById(long id)
     {
         return await categoryRepository.GetByIdAsync(id);
     }
 
-    public async ValueTask<IList<SeminarVideo>> GetSeminarVideoByCategoryIdAsync(MetaQueryModel metaQuery, int categoryId)
+    public async Task<IList<SeminarVideo>> GetSeminarVideoByCategoryIdAsync(MetaQueryModel metaQuery, long categoryId)
     {
         var seminars = await seminarVideoRepository
-             .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+             .GetAllAsQueryable()
              .Where(vc => vc.CategoryId == categoryId)
              .Skip(metaQuery.Skip)
              .Take(metaQuery.Take)
@@ -151,10 +153,10 @@ public class SeminarVideoService(
         return seminars;
     }
 
-    public async ValueTask<IList<SeminarVideoForWhithDetaileDto>> GetSeminarVideoWithDetailsAsync(MetaQueryModel metaQuery)
+    public async Task<IList<SeminarVideoForWhithDetaileDto>> GetSeminarVideoWithDetailsAsync(MetaQueryModel metaQuery)
     {
         var articles = seminarVideoRepository
-                .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+                .GetAllAsQueryable()
                 .Skip(metaQuery.Skip)
                 .Take(metaQuery.Take)
                 .ToList();
@@ -171,7 +173,7 @@ public class SeminarVideoService(
         return result;
     }
 
-    public async ValueTask<SeminarVideo> UpdateSeminarVideoAsync(SeminarVideo seminarVideo)
+    public async Task<SeminarVideo> UpdateSeminarVideoAsync(SeminarVideo seminarVideo)
     {
         var result = await seminarVideoRepository.GetByIdAsync(seminarVideo.Id)
            ?? throw new NotFoundException("Logotype not found");
@@ -180,10 +182,10 @@ public class SeminarVideoService(
         result.CategoryId = seminarVideo.CategoryId != 0 ? seminarVideo.CategoryId : result.CategoryId;
         result.AuthorId = seminarVideo.AuthorId != 0 ? seminarVideo.AuthorId : result.AuthorId;
 
-        return await seminarVideoRepository .UpdateAsync(result);
+        return await seminarVideoRepository .UpdateWithSaveChangesAsync(result);
     }
 
-    public async ValueTask<Category> UpdateSeminarVideoCategoryAsync(Category seminarVideoCategory)
+    public async Task<Category> UpdateSeminarVideoCategoryAsync(Category seminarVideoCategory)
     {
         var result = await categoryRepository.GetByIdAsync(seminarVideoCategory.Id)
                            ?? throw new NotFoundException("Logotype not found");
@@ -191,6 +193,6 @@ public class SeminarVideoService(
         result.Title = seminarVideoCategory?.Title ?? result.Title;
         result.Description = seminarVideoCategory.Description ?? result.Description;
 
-        return await categoryRepository .UpdateAsync(result);
+        return await categoryRepository.UpdateWithSaveChangesAsync(result);
     }
 }

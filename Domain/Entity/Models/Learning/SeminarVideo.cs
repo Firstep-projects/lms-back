@@ -10,7 +10,7 @@ public class SeminarVideo : AuditableModelBase<long>
     public string VideoLinc { get; set; }
 
     [Column("title")]
-    public MultiLanguageField Title { get; set; }
+    public string Title { get; set; }
 
     [Column("author_id")]
     [ForeignKey(nameof(Author))]

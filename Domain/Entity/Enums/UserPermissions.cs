@@ -32,6 +32,16 @@ public enum UserPermissions
             RemoveUserStructure = 10120005,
         #endregion
     #endregion
+
+    #region Learning Project 30
+
+    #region MyRegion
+
+    
+
+    #endregion
+
+    #endregion
     #region MosqueApi 40
         #region Mosques Controller 10
             OnSaveMosque = 40100001,

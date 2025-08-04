@@ -1,14 +1,16 @@
-﻿using Entity.DataTransferObjects.Learning;
+﻿using DatabaseBroker.Repositories;
+using Entity.DataTransferObjects.Learning;
 using Entity.Exceptions;
 using Entity.Models.Learning;
+using Microsoft.EntityFrameworkCore;
 
 namespace LearningService.Services;
 
 public class CourseService(
-    ICourseRepository courseRepository)
+    GenericRepository<Course, long> courseRepository)
     : ICourseService
 {
-    public async Task<Course> CreateCourseAsync(CourseDto courseDto, int userId)
+    public async Task<Course> CreateCourseAsync(CourseDto courseDto, long userId)
     {
         var newCourse = new Course
         {
@@ -21,21 +23,21 @@ public class CourseService(
             CreatedBy = userId,
         };
 
-        return await courseRepository.AddAsync(newCourse);
+        return await courseRepository.AddWithSaveChangesAsync(newCourse);
     }
-    public async Task<Course> DeleteCourseAsync(int courseId, int userId)
+    public async Task<Course> DeleteCourseAsync(long courseId, long userId)
     {
         var courseResult = await courseRepository.GetByIdAsync(courseId)
             ?? throw new NotFoundException("Not found");
         
         courseResult.UpdatedBy = userId;
 
-        return await courseRepository.RemoveAsync(courseResult);
+        return await courseRepository.RemoveWithSaveChangesAsync(courseId);
     }
     public async Task<IList<Course>> GetAllCourseAsync(MetaQueryModel metaQuery)
     {
         var courses = await courseRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
             .Select(c => new Course()
@@ -54,10 +56,10 @@ public class CourseService(
 
         return courses;
     }
-    public async Task<IList<Course>> GetAllCourseByCategoryIdAsync(MetaQueryModel metaQuery,int categoryId)
+    public async Task<IList<Course>> GetAllCourseByCategoryIdAsync(MetaQueryModel metaQuery,long categoryId)
     {
         var courses = await courseRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Where(c => c.CategoryId == categoryId)
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
@@ -77,10 +79,10 @@ public class CourseService(
 
         return courses;
     }
-    public async Task<IList<Course>> GetAllCourseByAuthorIdAsync(MetaQueryModel metaQuery, int authorId)
+    public async Task<IList<Course>> GetAllCourseByAuthorIdAsync(MetaQueryModel metaQuery, long authorId)
     {
         var newCourse = await courseRepository
-           .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+           .GetAllAsQueryable()
            .Where(x => x.AuthorId == authorId)
            .Skip(metaQuery.Skip)
            .Select(c => new Course()
@@ -99,10 +101,10 @@ public class CourseService(
         
         return newCourse;
     }
-    public async Task<IList<Course>> GetAllCourseByHashtagIdAsync(MetaQueryModel metaQuery, int hashtagId)
+    public async Task<IList<Course>> GetAllCourseByHashtagIdAsync(MetaQueryModel metaQuery, long hashtagId)
     {
         var newCourse = await courseRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
             .Select(c => new Course()
@@ -121,7 +123,7 @@ public class CourseService(
 
         return newCourse;
     }
-    public async Task<Course> GetCourseByIdAsync(int id)
+    public async Task<Course> GetCourseByIdAsync(long id)
     {
         var courseResult = await courseRepository
                 .GetAllAsQueryable(true)
@@ -142,7 +144,7 @@ public class CourseService(
 
          return courseResult;
     }
-    public async Task<Course> UpdateCourseAsync(Course course, int userId)
+    public async Task<Course> UpdateCourseAsync(Course course, long userId)
     {
         var courseResult = await courseRepository.GetByIdAsync(course.Id)
             ?? throw new NotFoundException("Not found");
@@ -155,6 +157,6 @@ public class CourseService(
         courseResult.CategoryId = (course.CategoryId != 0) ? course.CategoryId : courseResult.CategoryId;
         courseResult.UpdatedBy = userId;
         
-        return await courseRepository.UpdateAsync(courseResult);
+        return await courseRepository.UpdateWithSaveChangesAsync(courseResult);
     }
 }

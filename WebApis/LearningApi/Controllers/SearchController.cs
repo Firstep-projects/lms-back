@@ -1,4 +1,4 @@
-﻿using Entity.Models.ApiModels;
+﻿using LearningService.Services;
 using Microsoft.AspNetCore.Mvc;
 using WebCore.Controllers;
 using WebCore.Models;
@@ -14,90 +14,85 @@ public class SearchController(
     ISeminarVideoService seminarVideoService)
     : ApiControllerBase
 {
-    private readonly IArticleService _articleService = articleService;
-    private readonly ICourseService _courseService = courseService;
-    private readonly IShortVideoService _shortVideoService = shortVideoService;
-    private readonly ISeminarVideoService _seminarVideoService = seminarVideoService;
-
     [HttpGet]
-    public async ValueTask<ResponseModel> GetShortVideoCategoryId([FromQuery] int categoryId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetShortVideoCategoryId([FromQuery] int categoryId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _shortVideoService.GetShortVideoByCategoryIdAsync(metaQuery, categoryId));
+            .ResultFromContent(await shortVideoService.GetShortVideoByCategoryIdAsync(metaQuery, categoryId));
     }
     [HttpGet]
-    public async ValueTask<ResponseModel> GetShortVideoByAuthorId([FromQuery] int authorId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetShortVideoByAuthorId([FromQuery] int authorId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _shortVideoService.GetShortVideoByAftorIdAsync(metaQuery, authorId));
+            .ResultFromContent(await shortVideoService.GetShortVideoByAftorIdAsync(metaQuery, authorId));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetShortVideoByHashtagId([FromQuery] int id, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetShortVideoByHashtagId([FromQuery] int id, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _shortVideoService.GetShortVideoByHashtagIdAsync(metaQuery, id));
+            .ResultFromContent(await shortVideoService.GetShortVideoByHashtagIdAsync(metaQuery, id));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetArticleCategoryId([FromQuery] int categoryId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetArticleCategoryId([FromQuery] int categoryId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _articleService.GetAllArticleByCategoryIdAsync(metaQuery, categoryId));
+            .ResultFromContent(await articleService.GetAllArticleByCategoryIdAsync(metaQuery, categoryId));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetArticleByAuthorId([FromQuery] int authorId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetArticleByAuthorId([FromQuery] int authorId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _articleService.GetAllArticleByAuthorIdAsync(metaQuery, authorId));
+            .ResultFromContent(await articleService.GetAllArticleByAuthorIdAsync(metaQuery, authorId));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetArticleByHashtagId([FromQuery] int hashtagId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetArticleByHashtagId([FromQuery] int hashtagId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _articleService.GetAllArticleByHashtagIdAsync(metaQuery, hashtagId));
+            .ResultFromContent(await articleService.GetAllArticleByHashtagIdAsync(metaQuery, hashtagId));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetCourseCategoryId([FromQuery] int categoryId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetCourseCategoryId([FromQuery] int categoryId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _courseService.GetAllCourseByCategoryIdAsync(metaQuery, categoryId)); 
+            .ResultFromContent(await courseService.GetAllCourseByCategoryIdAsync(metaQuery, categoryId)); 
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetCourseByAuthorId([FromQuery] int authorId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetCourseByAuthorId([FromQuery] int authorId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _courseService.GetAllCourseByAuthorIdAsync(metaQuery, authorId));
+            .ResultFromContent(await courseService.GetAllCourseByAuthorIdAsync(metaQuery, authorId));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetCourseByHashtagId([FromQuery] int hashtagId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetCourseByHashtagId([FromQuery] int hashtagId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _courseService.GetAllCourseByHashtagIdAsync(metaQuery, hashtagId));
+            .ResultFromContent(await courseService.GetAllCourseByHashtagIdAsync(metaQuery, hashtagId));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetSeminarVideoCategoryId([FromQuery] int categoryId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetSeminarVideoCategoryId([FromQuery] int categoryId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.GetSeminarVideoByCategoryIdAsync(metaQuery, categoryId));
+            .ResultFromContent(await seminarVideoService.GetSeminarVideoByCategoryIdAsync(metaQuery, categoryId));
     }
     [HttpGet]
-    public async ValueTask<ResponseModel> GetSeminarVideoByAuthorId([FromQuery] int authorId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetSeminarVideoByAuthorId([FromQuery] int authorId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.GetAllSeminarVideoByAuthorIdAsync(metaQuery, authorId));
+            .ResultFromContent(await seminarVideoService.GetAllSeminarVideoByAuthorIdAsync(metaQuery, authorId));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetSeminarVideoByHashtagId([FromQuery] int hashtagId, [FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetSeminarVideoByHashtagId([FromQuery] int hashtagId, [FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.GetAllSeminarVideoByHashtagIdAsync(metaQuery, hashtagId));
+            .ResultFromContent(await seminarVideoService.GetAllSeminarVideoByHashtagIdAsync(metaQuery, hashtagId));
     }
 }

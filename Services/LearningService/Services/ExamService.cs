@@ -1,25 +1,22 @@
+using DatabaseBroker.Repositories;
 using Entity.DataTransferObjects.Learning;
 using Entity.Enum;
 using Entity.Exceptions;
 using Entity.Models.Learning;
+using Microsoft.EntityFrameworkCore;
 
 namespace LearningService.Services;
 
 public class ExamService(
-    IExamRepository examRepository,
-    IQuestionInExamRepository questionInExamRepository,
-    IQuestionRepository questionRepository,
-    IQuizRepository quizRepository)
+    GenericRepository<Exam, long> examRepository,
+    GenericRepository<QuestionInExam, long> questionInExamRepository,
+    GenericRepository<Question, long> questionRepository,
+    GenericRepository<Quiz, long> quizRepository)
     : IExamService
 {
-    private readonly IExamRepository _examRepository = examRepository;
-    private readonly IQuestionInExamRepository _questionInExamRepository = questionInExamRepository;
-    private readonly IQuestionRepository _questionRepository = questionRepository;
-    private readonly IQuizRepository _quizRepository = quizRepository;
-
-    public async ValueTask<ExamDto> CreateExamAsync(long userId, long quizId)
+    public async Task<ExamDto> CreateExamAsync(long userId, long quizId)
     {
-        var exams = await _examRepository.GetAllAsQueryable()
+        var exams = await examRepository.GetAllAsQueryable()
             .Where(e => e.QuizId == quizId)
             .Where(e => e.UserId == userId)
             .ToListAsync();
@@ -28,7 +25,7 @@ public class ExamService(
             .Where(e => DateTime.UtcNow - e.CreatedAt <= e.Quiz.Duration)
             .FirstOrDefault(e => e.Status == ExamStatus.Progress);
         
-        var quiz = await _quizRepository.GetByIdAsync(quizId)
+        var quiz = await quizRepository.GetByIdAsync(quizId)
                    ?? throw new NotFoundException("Not found quiz");
         
         var heart = 1;
@@ -41,7 +38,7 @@ public class ExamService(
 
         if (exam is null && exams.All(e => e.CreatedAt.Date != DateTime.UtcNow.Date))
         {
-            var questions = await _questionRepository.GetAllAsQueryable()
+            var questions = await questionRepository.GetAllAsQueryable()
                 .Where(q => q.QuizId == quizId)
                 .ToListAsync();
             
@@ -96,7 +93,7 @@ public class ExamService(
                 UsedHeart = heart
             };
 
-            exam = await _examRepository.AddAsync(exam);
+            exam = await examRepository.AddWithSaveChangesAsync(exam);
             exam.Quiz = quiz;
         }
         else if(exams.Any(e => e.CreatedAt.Date == DateTime.UtcNow.Date) && exam is null)
@@ -159,9 +156,9 @@ public class ExamService(
                 .ToList());
     }
 
-    public async ValueTask<ExamDto> CompletionExamAsync(ExamDto examDto)
+    public async Task<ExamDto> CompletionExamAsync(ExamDto examDto)
     {
-        var exam = await _examRepository.GetByIdAsync(examDto.id);
+        var exam = await examRepository.GetByIdAsync(examDto.id);
 
         if (exam.Status == ExamStatus.Finished)
         {
@@ -172,7 +169,7 @@ public class ExamService(
         {
             exam.ClosedAt = exam.CreatedAt.Add(exam.Quiz.Duration);
             exam.Status = ExamStatus.Finished;
-            await _examRepository.UpdateAsync(exam);
+            await examRepository.UpdateAsync(exam);
             throw new AlreadyExistsException("Time is up");
         }
         
@@ -189,14 +186,14 @@ public class ExamService(
                     {
                         var sq = q as SimpleQuestionInExam;
                         sq.Selected ??= dicQuestion[sq.Id].selected;
-                        q = await _questionInExamRepository.UpdateAsync(sq);
+                        q = await questionInExamRepository.UpdateWithSaveChangesAsync(sq);
                         return q;
                     } 
                     case QuestionTypes.Written: 
                     {
                         var wq = q as WrittenQuestionInExam;
                         wq.WrittenAnswer ??= dicQuestion[wq.Id].writtenAnswer;
-                        q = await _questionInExamRepository.UpdateAsync(wq);
+                        q = await questionInExamRepository.UpdateWithSaveChangesAsync(wq);
                         return q; 
                     } 
                     default: 
@@ -204,7 +201,7 @@ public class ExamService(
                 }
             }).ToList();
 
-        exam = await _examRepository.UpdateAsync(exam);
+        exam = await examRepository.UpdateWithSaveChangesAsync(exam);
         
         return new ExamDto(exam.Id,
             exam.QuizId,
@@ -264,9 +261,9 @@ public class ExamService(
                 .ToList());
     }
 
-    public async ValueTask<ExamResultDto> InformationExamAsync(long examId)
+    public async Task<ExamResultDto> InformationExamAsync(long examId)
     {
-        var exam = await _examRepository.GetByIdAsync(examId);
+        var exam = await examRepository.GetByIdAsync(examId);
         
         return new ExamResultDto(
             exam.Id,
@@ -348,9 +345,9 @@ public class ExamService(
                 .ToList());
     }
 
-    public async ValueTask<List<ExamForListDto>> GetExamsByUserAsync(long userId)
+    public async Task<List<ExamForListDto>> GetExamsByUserAsync(long userId)
     {
-        var exams =  await _examRepository.GetAllAsQueryable()
+        var exams =  await examRepository.GetAllAsQueryable()
             .Where(e => e.UserId == userId)
             .Select(e => new {
                 e.Id,
@@ -394,9 +391,9 @@ public class ExamService(
             .ToList();
     }
 
-    public async ValueTask<QuestionInExamDto> ReplyQuestionAsync(QuestionInExamDto questionInExamDto)
+    public async Task<QuestionInExamDto> ReplyQuestionAsync(QuestionInExamDto questionInExamDto)
     {
-        var questionInExam = await _questionInExamRepository.GetByIdAsync(questionInExamDto.id);
+        var questionInExam = await questionInExamRepository.GetByIdAsync(questionInExamDto.id);
         
         switch (questionInExam.QuestionType)
         {
@@ -404,7 +401,7 @@ public class ExamService(
             {
                 var simpleQuestion = questionInExam as SimpleQuestionInExam;
                 simpleQuestion.Selected = questionInExamDto.selected;
-                questionInExam = await _questionInExamRepository.UpdateAsync(simpleQuestion);
+                questionInExam = await questionInExamRepository.UpdateWithSaveChangesAsync(simpleQuestion);
                 return new QuestionInExamDto(
                     questionInExam.Id,
                     questionInExam.ExamId,
@@ -423,7 +420,7 @@ public class ExamService(
             {
                 var writtenQuestion = questionInExam as WrittenQuestionInExam;
                 writtenQuestion.WrittenAnswer = questionInExamDto.writtenAnswer;
-                questionInExam = await _questionInExamRepository.UpdateAsync(writtenQuestion);
+                questionInExam = await questionInExamRepository.UpdateWithSaveChangesAsync(writtenQuestion);
                 return new QuestionInExamDto(
                     questionInExam.Id,
                     questionInExam.ExamId,
@@ -445,15 +442,15 @@ public class ExamService(
 
     public async Task<QuizInfoDto> GetQuizByCourseIdAsync(long userId,long courseId)
     {
-        var quiz = await _quizRepository.GetAllAsQueryable()
+        var quiz = await quizRepository.GetAllAsQueryable()
             .Where(q => q.CourseItem.Id == courseId)
             .Select(q => new QuizInfoDto(
                 q.Id,
                 q.TotalScore,
                 q.PassingScore,
                 q.Duration.Minutes,
-                _questionRepository.Count(ques => ques.QuizId == q.Id),
-                q.Heart - _examRepository.Where(e => e.QuizId == q.Id && e.UserId == userId).Max(e => e.UsedHeart)))
+                questionRepository.GetAllAsQueryable(false,false).Count(ques => ques.QuizId == q.Id),
+                q.Heart - examRepository.GetAllAsQueryable(false,false).Where(e => e.QuizId == q.Id && e.UserId == userId).Max(e => e.UsedHeart)))
             .FirstOrDefaultAsync();
 
         return quiz;

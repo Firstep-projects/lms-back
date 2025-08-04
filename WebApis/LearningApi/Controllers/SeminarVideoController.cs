@@ -1,6 +1,7 @@
 using Entity.DataTransferObjects.Learning;
 using Entity.Models.ApiModels;
 using Entity.Models.Learning;
+using LearningService.Services;
 using Microsoft.AspNetCore.Mvc;
 using WebCore.Controllers;
 using WebCore.Models;
@@ -11,82 +12,80 @@ namespace LearningApi.Controllers;
 [ApiController]
 public class SeminarVideoController(ISeminarVideoService seminarVideoService) : ApiControllerBase
 {
-    private readonly ISeminarVideoService _seminarVideoService = seminarVideoService;
-
     [HttpPost]
-    public async ValueTask<ResponseModel> CreateSeminarVideo(SeminarVideoDto Course)
+    public async Task<ResponseModel> CreateSeminarVideo(SeminarVideoDto Course)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.CreateSeminarVideoAsync(Course));
+            .ResultFromContent(await seminarVideoService.CreateSeminarVideoAsync(Course));
     }
 
     [HttpPost]
-    public async ValueTask<ResponseModel> CreateCategory(CategoryDto Course)
+    public async Task<ResponseModel> CreateCategory(CategoryDto Course)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.CreateSeminarVideoCategoryAsync(Course));
+            .ResultFromContent(await seminarVideoService.CreateSeminarVideoCategoryAsync(Course));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetAllCategory([FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetAllCategory([FromQuery] MetaQueryModel metaQuery)
     {
         if (Request.Query.Count == 0)
             metaQuery.Take = 1000;
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.GetAllSeminarVideoCategoryAsync(metaQuery));
+            .ResultFromContent(await seminarVideoService.GetAllSeminarVideoCategoryAsync(metaQuery));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetSeminarVideoByCategoryId([FromQuery] MetaQueryModel metaQuery,int categoryId)
+    public async Task<ResponseModel> GetSeminarVideoByCategoryId([FromQuery] MetaQueryModel metaQuery,int categoryId)
     {
         if (Request.Query.Count == 1)
             metaQuery.Take = 1000;
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.GetSeminarVideoByCategoryIdAsync(metaQuery,categoryId));
+            .ResultFromContent(await seminarVideoService.GetSeminarVideoByCategoryIdAsync(metaQuery,categoryId));
     }
     
     [HttpGet]
-    public async ValueTask<ResponseModel> GetAllSeminarVideo([FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetAllSeminarVideo([FromQuery] MetaQueryModel metaQuery)
     {
         if (Request.Query.Count == 0)
             metaQuery.Take = 1000;
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.GetAllSeminarVideoAsync(metaQuery));
+            .ResultFromContent(await seminarVideoService.GetAllSeminarVideoAsync(metaQuery));
     }
     
     [HttpGet]
-    public async ValueTask<ResponseModel> GetSeminarVideoWithDetails([FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetSeminarVideoWithDetails([FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.GetSeminarVideoWithDetailsAsync(metaQuery));
+            .ResultFromContent(await seminarVideoService.GetSeminarVideoWithDetailsAsync(metaQuery));
     }
 
 
     [HttpPut]
-    public async ValueTask<ResponseModel> UpdateSeminarVideo(SeminarVideo Course)
+    public async Task<ResponseModel> UpdateSeminarVideo(SeminarVideo Course)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.UpdateSeminarVideoAsync(Course));
+            .ResultFromContent(await seminarVideoService.UpdateSeminarVideoAsync(Course));
     }
     
     [HttpPut]
-    public async ValueTask<ResponseModel> UpdateCategory(Category Course)
+    public async Task<ResponseModel> UpdateCategory(Category Course)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.UpdateSeminarVideoCategoryAsync(Course));
+            .ResultFromContent(await seminarVideoService.UpdateSeminarVideoCategoryAsync(Course));
     }
 
     [HttpDelete]
-    public async ValueTask<ResponseModel> DeleteSeminarVideo(int id)
+    public async Task<ResponseModel> DeleteSeminarVideo(int id)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.DeleteSeminarVideoAsync(id));
+            .ResultFromContent(await seminarVideoService.DeleteSeminarVideoAsync(id));
     }
     
     [HttpDelete]
-    public async ValueTask<ResponseModel> DeleteCategory(int id)
+    public async Task<ResponseModel> DeleteCategory(int id)
     {
         return ResponseModel
-            .ResultFromContent(await _seminarVideoService.DeleteSeminarVideoCategoryAsync(id));
+            .ResultFromContent(await seminarVideoService.DeleteSeminarVideoCategoryAsync(id));
     }
 }

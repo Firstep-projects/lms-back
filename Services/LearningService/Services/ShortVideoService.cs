@@ -1,14 +1,16 @@
-﻿using Entity.DataTransferObjects.Learning;
+﻿using DatabaseBroker.Repositories;
+using Entity.DataTransferObjects.Learning;
 using Entity.Exceptions;
 using Entity.Models.Learning;
+using Microsoft.EntityFrameworkCore;
 
 namespace LearningService.Services;
 
 public class ShortVideoService(
-    IShortVideoRepository shortVideoRepository)
+    GenericRepository<ShortVideo, long> shortVideoRepository)
     : IShortVideoService
 {
-    public async ValueTask<ShortVideo> CreateShortVideoAsync(ShortVideoDto article)
+    public async Task<ShortVideo> CreateShortVideoAsync(ShortVideoDto article)
     {
         var result = new ShortVideo()
         {
@@ -18,21 +20,21 @@ public class ShortVideoService(
             CategoryId = article.categoryId,
         };
 
-        return await shortVideoRepository.AddAsync(result);
+        return await shortVideoRepository.AddWithSaveChangesAsync(result);
     }
 
-    public async ValueTask<ShortVideo> DeleteShortVideoAsync(int articleId)
+    public async Task<ShortVideo> DeleteShortVideoAsync(long articleId)
     {
         var  articleResult = await shortVideoRepository.GetByIdAsync(articleId)
            ?? throw new NotFoundException("Logotype not found");
 
-        return await shortVideoRepository.RemoveAsync(articleResult);
+        return await shortVideoRepository.RemoveWithSaveChangesAsync(articleId);
     }
 
-    public async ValueTask<IList<ShortVideo>> GetAllShortVideoAsync(MetaQueryModel metaQuery)
+    public async Task<IList<ShortVideo>> GetAllShortVideoAsync(MetaQueryModel metaQuery)
     {
         var shortVideos = await shortVideoRepository
-          .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+          .GetAllAsQueryable()
           .Skip(metaQuery.Skip)
           .Take(metaQuery.Take)
           .Select(sh => new ShortVideo()
@@ -50,10 +52,10 @@ public class ShortVideoService(
         return shortVideos;
     }
 
-    public async ValueTask<IList<ShortVideo>> GetShortVideoByAftorIdAsync(MetaQueryModel metaQuery, int aftorId)
+    public async Task<IList<ShortVideo>> GetShortVideoByAftorIdAsync(MetaQueryModel metaQuery, long aftorId)
     {
         var articles =  await shortVideoRepository
-          .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+          .GetAllAsQueryable()
           .Where(x => x.AuthorId == aftorId)
           .Skip(metaQuery.Skip)
           .Take(metaQuery.Take)
@@ -72,10 +74,10 @@ public class ShortVideoService(
         return articles;
     }
 
-    public async ValueTask<IList<ShortVideo>> GetShortVideoByCategoryIdAsync(MetaQueryModel metaQuery, int categoryId)
+    public async Task<IList<ShortVideo>> GetShortVideoByCategoryIdAsync(MetaQueryModel metaQuery, long categoryId)
     {
         var articles = await shortVideoRepository
-          .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+          .GetAllAsQueryable()
           .Where(x => x.CategoryId == categoryId)
           .Skip(metaQuery.Skip)
           .Take(metaQuery.Take)
@@ -94,11 +96,10 @@ public class ShortVideoService(
         return articles;
     }
 
-    public async ValueTask<IList<ShortVideo>> GetShortVideoByHashtagIdAsync(MetaQueryModel metaQuery, int hashtagId)
+    public async Task<IList<ShortVideo>> GetShortVideoByHashtagIdAsync(MetaQueryModel metaQuery, long hashtagId)
     {
-       
         var filteredItems = await shortVideoRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
             .Select(sh => new ShortVideo()
@@ -116,10 +117,10 @@ public class ShortVideoService(
         return filteredItems;
     }
 
-    public async ValueTask<IList<ShortVideoForWithDetailsDto>> GetShortVideoWithDetailsAsync( MetaQueryModel metaQuery)
+    public async Task<IList<ShortVideoForWithDetailsDto>> GetShortVideoWithDetailsAsync(MetaQueryModel metaQuery)
     {
         var shortVideos = await shortVideoRepository
-            .GetAllAsQueryable(deleted:metaQuery.IsDeleted)
+            .GetAllAsQueryable()
             .Skip(metaQuery.Skip)
             .Take(metaQuery.Take)
             .Select(sh => new ShortVideo()
@@ -146,7 +147,7 @@ public class ShortVideoService(
         return result;
     }
 
-    public async ValueTask<ShortVideo> UpdateShortVideoAsync(ShortVideo article)
+    public async Task<ShortVideo> UpdateShortVideoAsync(ShortVideo article)
     {
         var articleResult = await shortVideoRepository.GetByIdAsync(article.Id)
            ?? throw new NotFoundException("Logotype not found");
@@ -156,6 +157,6 @@ public class ShortVideoService(
         articleResult.CategoryId = article.CategoryId != 0 ? article.CategoryId : articleResult.CategoryId;
         articleResult.AuthorId = article.AuthorId != 0 ? article.AuthorId : articleResult.AuthorId;
 
-        return await shortVideoRepository.UpdateAsync(articleResult);
+        return await shortVideoRepository.UpdateWithSaveChangesAsync(articleResult);
     }
 }

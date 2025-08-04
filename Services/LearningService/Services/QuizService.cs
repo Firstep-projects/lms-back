@@ -1,12 +1,14 @@
-﻿using Entity.DataTransferObjects.Learning;
+﻿using DatabaseBroker.Repositories;
+using Entity.DataTransferObjects.Learning;
 using Entity.Exceptions;
 using Entity.Models.Learning;
+using Microsoft.EntityFrameworkCore;
 
 namespace LearningService.Services;
 
 public class QuizService(
-    IQuizRepository quizRepository,
-    IQuestionRepository questionRepository)
+    GenericRepository<Quiz, long> quizRepository,
+    GenericRepository<Question, long> questionRepository)
     : IQuizService
 {
     public async Task<QuizDto> CreateQuizAsync(QuizDto quizDto)
@@ -18,14 +20,14 @@ public class QuizService(
             PassingScore = quizDto.passingScore
         };
 
-        return QuizToDto(await quizRepository.AddAsync(quiz));
+        return QuizToDto(await quizRepository.AddWithSaveChangesAsync(quiz));
     }
-    public async Task<QuizDto> DeleteQuizAsync(int id)
+    public async Task<QuizDto> DeleteQuizAsync(long id)
     {
         var quiz = await quizRepository.GetByIdAsync(id)
             ?? throw new NotFoundException("Not found");
 
-        return this.QuizToDto(await quizRepository.RemoveAsync(quiz));
+        return this.QuizToDto(await quizRepository.RemoveWithSaveChangesAsync(id));
     }
 
     public async Task<IList<QuizDto>> GetAllQuizAsync()
@@ -49,7 +51,7 @@ public class QuizService(
             Options = questionDto.options
         };
 
-        var simpleQuestion = await questionRepository.AddAsync(question);
+        var simpleQuestion = await questionRepository.AddWithSaveChangesAsync(question);
 
         return new QuestionDto(
             simpleQuestion.Id,
@@ -65,6 +67,7 @@ public class QuizService(
     public async Task<QuestionDto> UpdateQuestionAsync(QuestionDto questionDto)
     {
         var question = await questionRepository
+            .GetAllAsQueryable()
             .OfType<SimpleQuestion>()
             .OrderBy(q => q.OrderNumber)
             .FirstOrDefaultAsync(q => 
@@ -97,7 +100,7 @@ public class QuizService(
         var question = await questionRepository.GetByIdAsync(id)
                    ?? throw new NotFoundException("Not found");
 
-        var simpleQuestion = await questionRepository.RemoveAsync(question);
+        var simpleQuestion = await questionRepository.RemoveWithSaveChangesAsync(id);
         
         return new QuestionDto(
             question.Id,
@@ -110,7 +113,7 @@ public class QuizService(
             null);
     }
 
-    public async Task<(QuizDto,List<QuestionDto>)> GetQuizIncludeQuestionsByIdAsync(int id)
+    public async Task<(QuizDto,List<QuestionDto>)> GetQuizIncludeQuestionsByIdAsync(long id)
     {
         var quiz = await quizRepository
                        .GetAllAsQueryable()
@@ -119,7 +122,9 @@ public class QuizService(
         if (quiz is null)
             return (null,null);
 
-        var questions = await questionRepository.OfType<SimpleQuestion>()
+        var questions = await questionRepository
+            .GetAllAsQueryable()
+            .OfType<SimpleQuestion>()
             .Where(q => q.QuizId == quiz.Id)
             .OrderBy(q => q.OrderNumber)
             .Select(question => new QuestionDto(
@@ -136,7 +141,7 @@ public class QuizService(
         return (this.QuizToDto(quiz), questions);
     }
 
-    public async Task<QuizDto> GetQuizByIdAsync(int id)
+    public async Task<QuizDto> GetQuizByIdAsync(long id)
     {
         var quiz = await quizRepository.GetByIdAsync(id)
             ?? throw new NotFoundException("Not found");
@@ -153,7 +158,7 @@ public class QuizService(
         resultQuiz.TotalScore = (quizDto.totalScore != 0) ? quizDto.totalScore : resultQuiz.TotalScore;
         resultQuiz.PassingScore = (quizDto.passingScore is not 0) ? quizDto.passingScore : resultQuiz.PassingScore;
 
-        return this.QuizToDto(await quizRepository.UpdateAsync(resultQuiz));
+        return this.QuizToDto(await quizRepository.UpdateWithSaveChangesAsync(resultQuiz));
     }
 
     private QuizDto QuizToDto(Quiz quiz)

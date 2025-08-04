@@ -5,10 +5,10 @@ namespace LearningService.Services;
 
 public interface IVideoOfCourseService
 {
-    ValueTask<VideoOfCourse> CreateVideoOfCourseAsync(VideosOfCourseDto videoOfCourse);
-    ValueTask<IList<VideoOfCourse>> GetAllVideoOfCourseAsync(MetaQueryModel metaQuery);
-    ValueTask<IList<VideoOfCourse>> GetVideoOfCourseByCourseIdAsync(MetaQueryModel metaQuery, int courseId);
-    ValueTask<VideoOfCourse> GetVideoOfCourseByIdAsync(int id);
-    ValueTask<VideoOfCourse> UpdateVideoOfCourseAsync(VideoOfCourse videoOfCourse);
-    ValueTask<VideoOfCourse> DeleteVideoOfCourseAsync(int id);
+    Task<VideoOfCourse> CreateVideoOfCourseAsync(VideosOfCourseDto videoOfCourse);
+    Task<IList<VideoOfCourse>> GetAllVideoOfCourseAsync(MetaQueryModel metaQuery);
+    Task<IList<VideoOfCourse>> GetVideoOfCourseByCourseIdAsync(MetaQueryModel metaQuery, long courseId);
+    Task<VideoOfCourse> GetVideoOfCourseByIdAsync(long id);
+    Task<VideoOfCourse> UpdateVideoOfCourseAsync(VideoOfCourse videoOfCourse);
+    Task<VideoOfCourse> DeleteVideoOfCourseAsync(long id);
 }

@@ -10,15 +10,15 @@ public class ShortVideo : AuditableModelBase<long>
     public string VideoLinc { get; set; }
 
     [Column("title")]
-    public MultiLanguageField Title { get; set; }
+    public string Title { get; set; }
 
     [Column("author_id")]
     [ForeignKey(nameof(Author))]
-    public int AuthorId { get; set; }
+    public long AuthorId { get; set; }
     public virtual Author? Author { get; set; }
 
     [Column("category_id")]
     [ForeignKey(nameof(Category))]
-    public int CategoryId { get; set; }
+    public long CategoryId { get; set; }
     public virtual Category? Category { get; set; }
 }

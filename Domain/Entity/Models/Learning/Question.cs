@@ -16,7 +16,7 @@ public abstract class Question : AuditableModelBase<long>
     [Column("question_type")]
     public QuestionTypes QuestionType { get; set; } = QuestionTypes.Simple;
     [Column("question_content")]
-    public MultiLanguageField? QuestionContent { get; set; }
+    public string? QuestionContent { get; set; }
     [Column("image_link")]
     public string? ImageLink { get; set; }
     [Column("doc_link")]

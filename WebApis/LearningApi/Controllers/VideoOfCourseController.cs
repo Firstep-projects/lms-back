@@ -1,5 +1,6 @@
 ﻿using Entity.DataTransferObjects.Learning;
 using Entity.Models.Learning;
+using LearningService.Services;
 using Microsoft.AspNetCore.Mvc;
 using WebCore.Controllers;
 using WebCore.Models;
@@ -10,50 +11,48 @@ namespace LearningApi.Controllers;
 [ApiController]
 public class VideoOfCourseController(IVideoOfCourseService videoOfCourseService) : ApiControllerBase
 {
-    private readonly IVideoOfCourseService _videoOfCourseService = videoOfCourseService;
-
     [HttpPost]
-    public async ValueTask<ResponseModel> CreateVideoOfCourse(VideosOfCourseDto Course)
+    public async Task<ResponseModel> CreateVideoOfCourse(VideosOfCourseDto Course)
     {
         return ResponseModel
-            .ResultFromContent(await _videoOfCourseService.CreateVideoOfCourseAsync(Course));
+            .ResultFromContent(await videoOfCourseService.CreateVideoOfCourseAsync(Course));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetVideoOfCourseById(int id)
+    public async Task<ResponseModel> GetVideoOfCourseById(int id)
     {
         return ResponseModel
-            .ResultFromContent(await _videoOfCourseService.GetVideoOfCourseByIdAsync(id));
+            .ResultFromContent(await videoOfCourseService.GetVideoOfCourseByIdAsync(id));
     }
     
     [HttpGet]
-    public async ValueTask<ResponseModel> GetVideoOfCourseByCourseId([FromQuery] int courseId,[FromQuery]MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetVideoOfCourseByCourseId([FromQuery] int courseId,[FromQuery]MetaQueryModel metaQuery)
     {
         if (Request.Query.Count == 1)
             metaQuery.Take = 1000;
 
         return ResponseModel
-            .ResultFromContent(await _videoOfCourseService.GetVideoOfCourseByCourseIdAsync(metaQuery,courseId));
+            .ResultFromContent(await videoOfCourseService.GetVideoOfCourseByCourseIdAsync(metaQuery,courseId));
     }
     
     [HttpGet]
-    public async ValueTask<ResponseModel> GetAllVideoOfCourse([FromQuery]  MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetAllVideoOfCourse([FromQuery]  MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _videoOfCourseService.GetAllVideoOfCourseAsync(metaQuery));
+            .ResultFromContent(await videoOfCourseService.GetAllVideoOfCourseAsync(metaQuery));
     }
 
     [HttpPut]
-    public async ValueTask<ResponseModel> UpdateVideoOfCourse(VideoOfCourse Course)
+    public async Task<ResponseModel> UpdateVideoOfCourse(VideoOfCourse Course)
     {
         return ResponseModel
-            .ResultFromContent(await _videoOfCourseService.UpdateVideoOfCourseAsync(Course));
+            .ResultFromContent(await videoOfCourseService.UpdateVideoOfCourseAsync(Course));
     }
 
     [HttpDelete]
-    public async ValueTask<ResponseModel> DeleteVideoOfCourse(int id)
+    public async Task<ResponseModel> DeleteVideoOfCourse(int id)
     {
         return ResponseModel
-            .ResultFromContent(await _videoOfCourseService.DeleteVideoOfCourseAsync(id));
+            .ResultFromContent(await videoOfCourseService.DeleteVideoOfCourseAsync(id));
     }
 }

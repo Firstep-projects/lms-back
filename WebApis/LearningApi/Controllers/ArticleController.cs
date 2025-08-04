@@ -1,5 +1,6 @@
 using Entity.DataTransferObjects.Learning;
 using Entity.Models.Learning;
+using LearningService.Services;
 using Microsoft.AspNetCore.Mvc;
 using WebCore.Controllers;
 using WebCore.Models;
@@ -10,61 +11,59 @@ namespace LearningApi.Controllers;
 [ApiController]
 public class ArticleController(IArticleService articleService) : ApiControllerBase
 {
-    private readonly IArticleService _articleService = articleService;
-
     [HttpPost]
-    public async ValueTask<ResponseModel> CreateArticle(ArticleDto article)
+    public async Task<ResponseModel> CreateArticle(ArticleDto article)
     {
         return ResponseModel
-            .ResultFromContent(await _articleService.CreateArticleAsync(article));
+            .ResultFromContent(await articleService.CreateArticleAsync(article));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetAllArticle([FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetAllArticle([FromQuery] MetaQueryModel metaQuery)
     {
         if (Request.Query.Count == 0)
             metaQuery.Take = 1000;
 
         return ResponseModel
 
-            .ResultFromContent(await _articleService.GetAllArticleAsync(metaQuery));
+            .ResultFromContent(await articleService.GetAllArticleAsync(metaQuery));
     }
     
     [HttpGet]
-    public async ValueTask<ResponseModel> GetAllArticleByCategoryId([FromQuery] MetaQueryModel metaQuery,[FromQuery]int categoryId)
+    public async Task<ResponseModel> GetAllArticleByCategoryId([FromQuery] MetaQueryModel metaQuery,[FromQuery]int categoryId)
     {
         if (Request.Query.Count == 0)
             metaQuery.Take = 1000;
 
         return ResponseModel
 
-            .ResultFromContent(await _articleService.GetAllArticleByCategoryIdAsync(metaQuery,categoryId));
+            .ResultFromContent(await articleService.GetAllArticleByCategoryIdAsync(metaQuery,categoryId));
     }
 
     [HttpGet]
-    public async ValueTask<ResponseModel> GetArticleById(int id)
+    public async Task<ResponseModel> GetArticleById(int id)
     {
         return ResponseModel
-            .ResultFromContent(await _articleService.GetArticleByIdAsync(id));
+            .ResultFromContent(await articleService.GetArticleByIdAsync(id));
     }
     [HttpGet]
-    public async ValueTask<ResponseModel> GetArticleWithDetails([FromQuery] MetaQueryModel metaQuery)
+    public async Task<ResponseModel> GetArticleWithDetails([FromQuery] MetaQueryModel metaQuery)
     {
         return ResponseModel
-            .ResultFromContent(await _articleService.GetArticleWithDetailsAsync(metaQuery));
+            .ResultFromContent(await articleService.GetArticleWithDetailsAsync(metaQuery));
     }
 
     [HttpPut]
-    public async ValueTask<ResponseModel> UpdateArticle(Article article)
+    public async Task<ResponseModel> UpdateArticle(Article article)
     {
         return ResponseModel
-            .ResultFromContent(await _articleService.UpdateArticleAsync(article));
+            .ResultFromContent(await articleService.UpdateArticleAsync(article));
     }
 
     [HttpDelete]
-    public async ValueTask<ResponseModel> DeleteArticle(int id)
+    public async Task<ResponseModel> DeleteArticle(int id)
     {
         return ResponseModel
-            .ResultFromContent(await _articleService.DeleteArticleAsync(id));
+            .ResultFromContent(await articleService.DeleteArticleAsync(id));
     }
 }
