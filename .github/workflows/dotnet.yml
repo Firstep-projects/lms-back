@@ -59,6 +59,6 @@ jobs:
           script: |
             cd /home/projects/lms_back
             git reset --hard
-            git pull origin master
+            git pull origin main
             docker compose down
             docker-compose --env-file .env.prod up -d
