@@ -57,7 +57,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /home/projects/lms_back
+            cd /home/projects/lms-back
             git reset --hard
             git pull origin main
             docker compose down
