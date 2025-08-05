@@ -4,7 +4,6 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
 WORKDIR /src
 COPY . .
-RUN dotnet nuget add source http://192.168.122.25:2000/v3/index.json -n LocalBaget
 RUN dotnet restore "GatewayApi/GatewayApi.csproj"
 COPY . .
 WORKDIR "/src/GatewayApi"
