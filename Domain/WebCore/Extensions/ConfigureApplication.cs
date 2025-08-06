@@ -35,7 +35,7 @@ public static class ConfigureApplication
     public static void ConfigureDefault(this WebApplicationBuilder builder)
     {
         var externalConfigPath = Environment.GetEnvironmentVariable("EXTERNAL_CONFIG_PATH");
-
+        Console.WriteLine(externalConfigPath);
         builder.Configuration
             .AddJsonFile(Path.Combine(Directory.GetParent(builder.Environment.ContentRootPath)?.Parent?.FullName ?? builder.Environment.ContentRootPath,
                 "Domain", "WebCore", "GeneralSettings.json"), optional: false, reloadOnChange: true)
