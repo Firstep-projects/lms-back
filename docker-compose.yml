@@ -92,7 +92,7 @@ services:
       - "${LEARNING_PORT}:4004"
     restart: always
 
-  RedisCache:
+  RedisCache-lms:
     image: redis:6.2-alpine
     restart: always
     ports:
@@ -101,7 +101,7 @@ services:
 
   postgres-lms:
     image: postgres:15
-    container_name: postgres
+    container_name: postgres-lms
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
