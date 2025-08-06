@@ -1,16 +1,16 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY . .
-RUN dotnet restore "AuthApi/AuthApi.csproj"
+RUN dotnet restore "WebApis/AuthApi/AuthApi.csproj"
 COPY . .
-WORKDIR "/src/AuthApi"
-RUN dotnet build "AuthApi.csproj" -c Release -o /app/build
+WORKDIR "/src/WebApis/AuthApi"
+RUN dotnet build "./AuthApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "AuthApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./AuthApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
