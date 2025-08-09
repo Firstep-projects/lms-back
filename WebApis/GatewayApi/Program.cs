@@ -4,7 +4,7 @@ using Serilog;
 using WebCore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.ConfigureDefault();
 builder
     .Services
     .AddCors(options =>

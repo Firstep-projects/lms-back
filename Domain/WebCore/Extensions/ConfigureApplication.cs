@@ -233,7 +233,7 @@ public static class ConfigureApplication
             options.SwaggerEndpoint("/swagger/Admin/swagger.json", "Admin API");
         });
         using var scope = app.Services.CreateScope();
-        await using var dataContext = scope.ServiceProvider.GetService<IhdaDataContext>();
+        await using var dataContext = scope.ServiceProvider.GetService<DataContext>();
         Log.Information("{0}", "Migrations applying...");
         await dataContext?.Database.MigrateAsync()!;
         Log.Information("{0}", "Migrations applied.");
