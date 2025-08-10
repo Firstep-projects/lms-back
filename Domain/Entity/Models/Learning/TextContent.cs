@@ -4,7 +4,7 @@ using Entity.Models.Common;
 namespace Entity.Models.Learning;
 
 [Table("test_contents", Schema = "learning")]
-public class TextContent : AuditableModelBase<int>
+public class TextContent : AuditableModelBase<long>
 {
     [Column("content")]
     public string Content { get; set; }

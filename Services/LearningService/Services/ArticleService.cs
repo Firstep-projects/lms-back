@@ -16,7 +16,6 @@ public class ArticleService(GenericRepository<Article, long>  articleRepository)
             Description = article.Description,
             Content = article.Content,
             Image = article.Image,
-            AuthorId =article.AuthorId,
             CategoryId = article.CategoryId,
         };
 

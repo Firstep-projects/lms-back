@@ -3,7 +3,7 @@ using Entity.Models.Common;
 
 namespace Entity.Models.Learning;
 
-[Table("short_video", Schema = "learning")]
+[Table("short_videos", Schema = "learning")]
 public class ShortVideo : AuditableModelBase<long>
 {
     [Column("video_linc")]

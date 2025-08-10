@@ -4,7 +4,7 @@ using Entity.Models.Common;
 namespace Entity.Models.Learning;
 
 [Table("modules", Schema = "learning")]
-public class Module : AuditableModelBase<int>
+public class Module : AuditableModelBase<long>
 {
     [Column("title")]
     public string Title { get; set; }
@@ -24,7 +24,7 @@ public class Module : AuditableModelBase<int>
 
     [Column("course_id")]
     [ForeignKey(nameof(Course))]
-    public int CourseId { get; set; }
+    public long CourseId { get; set; }
 
     #region Navigation Properties
     public virtual Course? Course { get; set; }

@@ -1,6 +1,8 @@
+using Entity.Enum;
 using Entity.Enums;
 using Entity.Models.Auth;
 using Entity.Models.Common;
+using Entity.Models.Learning;
 using Entity.Models.ReferenceBook;
 using Entity.Models.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -104,6 +106,26 @@ public class DataContext : DbContext
             .Entity<SignMethod>()
             .HasDiscriminator(x => x.Type)
             .HasValue<DefaultSignMethod>(SignMethods.Normal);
+        
+        modelBuilder.Entity<SimpleQuestion>()
+            .Property(x => x.Options)
+            .HasColumnType("jsonb");
+        
+        modelBuilder
+            .Entity<Question>()
+            .HasDiscriminator(x => x.QuestionType)
+            .HasValue<SimpleQuestion>(QuestionTypes.Simple)
+            .HasValue<WrittenQuestion>(QuestionTypes.Written);
+        
+        modelBuilder.Entity<SimpleQuestionInExam>()
+            .Property(x => x.Options)
+            .HasColumnType("jsonb");
+        
+        modelBuilder
+            .Entity<QuestionInExam>()
+            .HasDiscriminator(x => x.QuestionType)
+            .HasValue<SimpleQuestionInExam>(QuestionTypes.Simple)
+            .HasValue<WrittenQuestionInExam>(QuestionTypes.Written);
     }
     #region Auth schema
     public DbSet<Permission> Permissions { get; set; }
@@ -122,5 +144,24 @@ public class DataContext : DbContext
     public DbSet<Country> Countries { get; set; }
     public DbSet<Region> Regions { get; set; }
     public DbSet<District> Districts { get; set; }
+    #endregion
+
+    #region Learning schema
+
+    public DbSet<Article> Articles { get; set; }
+    public DbSet<Author> Authors { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<CourseItem> CourseItems { get; set; }
+    public DbSet<Exam> Exams { get; set; }
+    public DbSet<Module> Modules { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<QuestionInExam> QuestionInExams { get; set; }
+    public DbSet<Quiz> Quizzes { get; set; }
+    public DbSet<SeminarVideo> SeminarVideos { get; set; }
+    public DbSet<ShortVideo> ShortVideos { get; set; }
+    public DbSet<TextContent> TextContents { get; set; }
+    public DbSet<VideoOfCourse> VideoOfCourses { get; set; }
+
     #endregion
 }

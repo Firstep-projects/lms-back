@@ -4,7 +4,7 @@ using Entity.Models.Common;
 
 namespace Entity.Models.Learning;
 
-[Table("author", Schema = "learning")]
+[Table("authors", Schema = "learning")]
 public class Author : AuditableModelBase<long>
 {
     [Column("name")]
@@ -17,7 +17,7 @@ public class Author : AuditableModelBase<long>
     [Column("user_id")]
     [ForeignKey(nameof(User))]
     public long UserId { get; set; }
-    public User User { get; set; }
+    public virtual User User { get; set; }
     [NotMapped]public virtual ICollection<Course> Courses { get; set; }
     [NotMapped]public virtual ICollection<Article> Articles { get; set; }
     [NotMapped]public virtual ICollection<ShortVideo> ShortVideos { get; set; }
