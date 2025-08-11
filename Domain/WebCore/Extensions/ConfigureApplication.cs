@@ -195,23 +195,23 @@ public static class ConfigureApplication
                 };
                 options.Events = new JwtBearerEvents()
                 {
-                    OnTokenValidated = context =>
-                    {
-                        if(context.SecurityToken is not JwtSecurityToken securityToken) return Task.CompletedTask;
-
-                        var tokenId = securityToken.Id;
-                        var cache = context.HttpContext.RequestServices.GetRequiredService<ICacheService>();
-                        
-                        if(!cache.HasKeyAsync($"tokenId:{tokenId}").Result) return Task.CompletedTask;
-                        
-                        context.NoResult();
-                        context.Response.StatusCode = 401;
-                        return context.Response.WriteAsJsonAsync(new
-                        {
-                            message = "This token is blacklisted"
-                        });
-                    },
-                    OnAuthenticationFailed = _ => Task.CompletedTask
+                    // OnTokenValidated = context =>
+                    // {
+                    //     if(context.SecurityToken is not JwtSecurityToken securityToken) return Task.CompletedTask;
+                    //
+                    //     var tokenId = securityToken.Id;
+                    //     var cache = context.HttpContext.RequestServices.GetRequiredService<ICacheService>();
+                    //     
+                    //     if(!cache.HasKeyAsync($"tokenId:{tokenId}").Result) return Task.CompletedTask;
+                    //     
+                    //     context.NoResult();
+                    //     context.Response.StatusCode = 401;
+                    //     return context.Response.WriteAsJsonAsync(new
+                    //     {
+                    //         message = "This token is blacklisted"
+                    //     });
+                    // },
+                    // OnAuthenticationFailed = _ => Task.CompletedTask
                 };
             });
 

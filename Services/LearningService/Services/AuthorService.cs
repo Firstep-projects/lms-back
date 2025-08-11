@@ -8,25 +8,25 @@ namespace LearningService.Services;
 
 public class AuthorService(GenericRepository<Author, long> repository) : IAuthorService
 {
-    public async Task<Author> CreateAuthorAsync(AuthorDto article, long userId)
+    public async Task<Author> CreateAuthorAsync(AuthorDto article/*, long userId*/)
     {
         var result = new Author
         {
             Name = article.name,
             Content = article.content,
             ImageLink = article.imageLink ?? "",
-            UserId = userId
+            //UserId = userId
         };
         
         return await repository.AddWithSaveChangesAsync(result);
     }
-    public async Task<Author> DeleteAuthorAsync(long articleId, long userId)
+    public async Task<Author> DeleteAuthorAsync(long articleId/*, long userId*/)
     {
         var articleResult = await repository.GetByIdAsync(articleId)
            ?? throw new NotFoundException("Author not found");
         
-        if(articleResult.UserId != userId)
-            throw new NotFoundException("Author not found");
+        // if(articleResult.UserId != userId)
+        //     throw new NotFoundException("Author not found");
 
         return await repository.RemoveWithSaveChangesAsync(articleId);
     }
@@ -50,13 +50,13 @@ public class AuthorService(GenericRepository<Author, long> repository) : IAuthor
 
         return articles;
     }
-    public async Task<Author> UpdateAuthorAsync(AuthorDto article, long userId)
+    public async Task<Author> UpdateAuthorAsync(AuthorDto article/*, long userId*/)
     {
         var articleResult = await repository.GetByIdAsync(article.id)
             ?? throw new NotFoundException("Not found");
         
-        if(articleResult.UserId != userId)
-            throw new NotFoundException("Not found");
+        // if(articleResult.UserId != userId)
+        //     throw new NotFoundException("Not found");
         
         articleResult.Name = article.name ?? articleResult.Name;
         articleResult.Content = article.content ?? articleResult.Content;

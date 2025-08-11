@@ -14,7 +14,7 @@ public class AuthorController(IAuthorService authorService) : ApiControllerBase
     public async Task<ResponseModel> CreateAuthor(AuthorDto author)
     {
         return ResponseModel
-            .ResultFromContent(await authorService.CreateAuthorAsync(author, UserId));
+            .ResultFromContent(await authorService.CreateAuthorAsync(author));
     }
 
     [HttpGet]
@@ -35,13 +35,13 @@ public class AuthorController(IAuthorService authorService) : ApiControllerBase
     public async Task<ResponseModel> UpdateAuthor(AuthorDto author)
     {
         return ResponseModel
-            .ResultFromContent(await authorService.UpdateAuthorAsync(author, UserId));
+            .ResultFromContent(await authorService.UpdateAuthorAsync(author));
     }
 
     [HttpDelete]
     public async Task<ResponseModel> DeleteAuthor(int id)
     {
         return ResponseModel
-            .ResultFromContent(await authorService.DeleteAuthorAsync(id, UserId));
+            .ResultFromContent(await authorService.DeleteAuthorAsync(id));
     }
 }

@@ -14,10 +14,10 @@ public class Author : AuditableModelBase<long>
     [Column("image_link")] 
     public string ImageLink { get; set; }
 
-    [Column("user_id")]
-    [ForeignKey(nameof(User))]
-    public long UserId { get; set; }
-    public virtual User User { get; set; }
+    // [Column("user_id")]
+    // [ForeignKey(nameof(User))]
+    // public long UserId { get; set; }
+    // public virtual User User { get; set; }
     [NotMapped]public virtual ICollection<Course> Courses { get; set; }
     [NotMapped]public virtual ICollection<Article> Articles { get; set; }
     [NotMapped]public virtual ICollection<ShortVideo> ShortVideos { get; set; }
