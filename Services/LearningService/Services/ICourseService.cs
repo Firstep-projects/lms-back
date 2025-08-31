@@ -13,4 +13,8 @@ public interface ICourseService
     Task<IList<Course>> GetAllCourseByAuthorIdAsync(MetaQueryModel metaQuery,long authorId);
     Task<IList<Course>> GetAllCourseByHashtagIdAsync(MetaQueryModel metaQuery, long hashtagId);
     Task<IList<Course>> GetAllCourseByCategoryIdAsync(MetaQueryModel metaQuery, long categoryId);
+    Task<ModuleDto> CreateModuleAsync(ModuleDto moduleDto, long userId);
+    Task<Module> DeleteModuleAsync(long moduleId, long userId);
+    Task<IList<ModuleDto>> GetAllModuleByCourseIdAsync(MetaQueryModel metaQuery, long courseId);
+    Task<Module> UpdateModuleAsync(ModuleDto moduleDto, long userId);
 }

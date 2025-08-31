@@ -52,4 +52,28 @@ public class CourseController(ICourseService courseService) : ApiControllerBase
         return ResponseModel
             .ResultFromContent(await courseService.DeleteCourseAsync(id, UserId));
     }
+    [HttpPost]
+    public async Task<ResponseModel> CreateModule(ModuleDto moduleDto)
+    {
+        return ResponseModel
+            .ResultFromContent(await courseService.CreateModuleAsync(moduleDto, UserId));
+    }
+    [HttpGet]
+    public async Task<ResponseModel> GetAllModuleByCourseId([FromQuery] MetaQueryModel metaQuery,[FromQuery]int courseId)
+    {
+        return ResponseModel
+            .ResultFromContent(await courseService.GetAllModuleByCourseIdAsync(metaQuery,courseId));
+    }
+    [HttpDelete]
+    public async Task<ResponseModel> DeleteModule(int id)
+    {
+        return ResponseModel
+            .ResultFromContent(await courseService.DeleteModuleAsync(id, UserId));
+    }
+    [HttpPut]
+    public async Task<ResponseModel> UpdateModule(ModuleDto moduleDto)
+    {
+        return ResponseModel
+            .ResultFromContent(await courseService.UpdateModuleAsync(moduleDto, UserId));
+    }
 }

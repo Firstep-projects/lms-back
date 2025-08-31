@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQuizService, QuizService>();
         services.AddScoped<ISeminarVideoService, SeminarVideoService>();
         services.AddScoped<IShortVideoService, ShortVideoService>();
-        services.AddScoped<IVideoOfCourseService, VideoOfCourseService>();
+        services.AddScoped<IItemOfCourseService, ItemOfCourseService>();
         return services;
     }
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
